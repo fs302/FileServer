@@ -83,7 +83,7 @@ int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
                 losepack = 1;
             }
         } 
-        if (losepack==0 && cwnd*2<=MAX_WINDOW_SIZE)
+        if (losepack==0 && cwnd+1<=MAX_WINDOW_SIZE)
             cwnd += 1;
         else if (losepack==1 && cwnd>1)
             cwnd /= 2;

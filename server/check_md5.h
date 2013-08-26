@@ -7,4 +7,5 @@
 #define FILE_NAME_MAX_SIZE 512
 #define DEFAULT_DIR "/home/fs302/file_server/server"
 
+int copyfile(char *source, char *target);
 int check_md5(char *message);

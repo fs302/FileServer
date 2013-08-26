@@ -38,7 +38,7 @@ int ShakeHands(char *file_name, FILE **fpp)
     FILE *fp = *fpp;
     fp = fopen(file_name, "rb");
     if (NULL == fp){
-        printf("File:\t %s can not open to write.\n",file_name);exit(1);
+        printf("File:\t %s can not open to read.\n",file_name);exit(1);
     }
     char message[BUFFER_SIZE],md5sum[33]={'\0'};
     md5(&filesize,md5sum,&fp);
@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         printf("Sending...\n"); 
         fp = fopen(file_name, "rb");
         if (NULL == fp){
-            printf("File:\t %s can not open to write.\n",file_name);exit(1);
+            printf("File:\t %s can not open to read.\n",file_name);exit(1);
         }
         struct timeval start,finish;
         gettimeofday(&start,NULL);

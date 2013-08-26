@@ -1,6 +1,39 @@
 #include "check_md5.h"
 #include "../md5.h"
 
+int copyfile(char *source, char *target)
+{
+    FILE *fps,*fpt;
+    if ( (fps = fopen(source,"r")) == NULL)
+    {
+        printf("open %s failed.\n",source);
+        return -1;
+    }
+    if ( (fpt = fopen(target,"w")) == NULL)
+    {
+        printf("open %s failed.\n",target);
+        return -1;
+    }
+    int FileNotEnd = 1;
+    int file_block_length = 0,file_write_length = 0;
+    char buffer[BUFFER_SIZE];
+    bzero(&buffer,BUFFER_SIZE);
+    while( (file_block_length = fread(buffer, sizeof(char), BUFFER_SIZE, fps)) > 0)
+    {
+        
+        file_write_length = fwrite(buffer, sizeof(char), file_block_length, fpt);
+        if (file_write_length != file_block_length)
+        {
+            printf("Write failed.\n");
+            return -1;
+        }
+        bzero(&buffer,BUFFER_SIZE);
+    }
+    fclose(fps);
+    fclose(fpt);
+    return 0;
+}
+
 int check_md5(char *message)
 {
     // Step1: get directory list
@@ -63,14 +96,26 @@ int check_md5(char *message)
     // Step3: write database & Check message
     db = fopen("md5_db.txt","w");
     int ret = 0;
+    char message_file[BUFFER_SIZE],message_md5[33]={'\0'};
+    sscanf(message,"%s\t%d\t%s",message_file,&filesize,message_md5);
     for(i = 0;i < Nid;i++)
     {
         fputs(db_list[i],db);
-        if (strncmp(db_list[i],message,strlen(message))==0)
+        sscanf(db_list[i],"%s\t%d\t%s",filename,&filesize,md5sum);
+        if (strncmp(md5sum,message_md5,strlen(message_md5))==0)
+        {
             ret = 1;
+            if(strncmp(db_list[i],message,strlen(message)) != 0)
+                copyfile(filename,message_file);
+        }
+    }
+    if (ret==0)
+    {
+        sscanf(message,"%s\t%d\t%s",message_file,&filesize,message_md5);
+        sprintf(buffer,"%s\t%d\t%s\n",message_file,filesize,message_md5);
+        fputs(buffer,db);
     }
     fclose(db);
     printf("%s\n",message);
-    printf("checkmd5 finishd with %d\n",ret); 
     return ret;
 }

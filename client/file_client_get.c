@@ -43,9 +43,9 @@ int ShakeHands(char *file_name, FILE **fp)
     
     Packet ack;
     Recvfrom(client_socket, (char *)&ack, sizeof(Packet), 0, (struct sockaddr *)&server_addr, &slen);
-    if (ack.dataID == -2){
+    if (ack.dataID == -5){
         printf("File not found.\n");
-        return -2;
+        return -5;
     }
     else{
         *fp = fopen(file_name, "wb");
