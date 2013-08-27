@@ -7,6 +7,7 @@ int client_socket;
 struct sockaddr_in server_addr, client_addr;
 socklen_t slen = sizeof(server_addr);
 
+// 创建套接字
 int initConnection()
 {
     bzero(&client_addr, sizeof(client_addr));
@@ -29,11 +30,12 @@ int initConnection()
     return 0;
 }
 
+// 发起三次握手
 int ShakeHands(char *file_name, FILE **fpp)
 {
-    // Fill in file name to filenamePacket
     Packet fnpack;
     int filesize = 0;
+    // 上传请求信号 dataID = -3
     fnpack.dataID = -3;
     FILE *fp = *fpp;
     fp = fopen(file_name, "rb");
@@ -41,9 +43,9 @@ int ShakeHands(char *file_name, FILE **fpp)
         printf("File:\t %s can not open to read.\n",file_name);exit(1);
     }
     char message[BUFFER_SIZE],md5sum[33]={'\0'};
-    md5(&filesize,md5sum,&fp);
+    md5(&filesize,md5sum,&fp);                              // 计算文件大小和md5
     bzero(&message,sizeof(message));
-    sprintf(message,"%s\t%d\t%s",file_name,filesize,md5sum);
+    sprintf(message,"%s\t%d\t%s",file_name,filesize,md5sum);// 发送message包括文件名，文件大小和md5
     strncpy(fnpack.data, message, strlen(message));
     fnpack.dataLength = strlen(message);
     fnpack.flag = -1;
@@ -54,6 +56,7 @@ int ShakeHands(char *file_name, FILE **fpp)
     Packet ack;
     Recvfrom(client_socket, (char *)&ack, sizeof(Packet), 0, (struct sockaddr *)&server_addr, &slen);
     if (ack.dataID == -5){
+        // 服务器反馈 -5，说明秒传命中
         printf("File Exist on Server. Using fast copy.\n");
         return -5;
     }
@@ -66,7 +69,6 @@ int main(int argc, char *argv[])
     
     char file_name[FILE_NAME_MAX_SIZE+1];
     bzero(file_name, FILE_NAME_MAX_SIZE+1);
-    //strncpy(file_name,DEFAULT_FILE,strlen(DEFAULT_FILE));
     if (argc>1){
         strncpy(file_name,argv[1],strlen(argv[1]));
     }
@@ -82,7 +84,6 @@ int main(int argc, char *argv[])
         Transfer(client_socket,server_addr, &fp);
         fclose(fp);
         gettimeofday(&finish,NULL);
-        freopen("/dev/tty","w",stdout);
         printf("Send File:\t %s To Server [%s] Finished.\n", file_name, IP);
         double duration = (double)((finish.tv_sec-start.tv_sec)*1000000.0+finish.tv_usec-start.tv_usec)/1000000.0;
         printf("Duration: %.3lf sec\n",duration);

@@ -7,6 +7,7 @@ int client_socket;
 struct sockaddr_in server_addr, client_addr;
 socklen_t slen = sizeof(server_addr);
 
+// 创建套接字
 int initConnection()
 {
     bzero(&client_addr, sizeof(client_addr));
@@ -29,11 +30,13 @@ int initConnection()
     return 0;
 }
 
+// 发起三次握手
 int ShakeHands(char *file_name, FILE **fp)
 {
-    // Fill in file name to filenamePacket
     Packet fnpack;
+    // 下载请求信号 dataID = -1
     fnpack.dataID = -1;
+    // Fill in file name to filenamePacket
     strncpy(fnpack.data, file_name, strlen(file_name));
     fnpack.dataLength = strlen(file_name);
     fnpack.flag = -1;
@@ -67,7 +70,6 @@ int main(int argc, char *argv[])
     
     char file_name[FILE_NAME_MAX_SIZE+1];
     bzero(file_name, FILE_NAME_MAX_SIZE+1);
-    //strncpy(file_name,DEFAULT_FILE,strlen(DEFAULT_FILE));
     if (argc>1){
         strncpy(file_name,argv[1],strlen(argv[1]));
     }
@@ -76,10 +78,12 @@ int main(int argc, char *argv[])
         printf("Receving...\n"); 
         struct timeval start,finish;
         gettimeofday(&start,NULL);
+
+        // 文件接收模块
         FileReceive(client_socket,server_addr, &fp);
+
         fclose(fp);
         gettimeofday(&finish,NULL);
-        freopen("/dev/tty","w",stdout);
         printf("Receive File:\t %s From Server [%s] Finished.\n", file_name, IP);
         double duration = (double)((finish.tv_sec-start.tv_sec)*1000000.0+finish.tv_usec-start.tv_usec)/1000000.0;
         printf("Duration: %.3lf sec\n",duration);

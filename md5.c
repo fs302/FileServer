@@ -1,5 +1,7 @@
 #include "md5.h"
 
+// 返回文件大小和md5
+// 编译时，要加 -lcrypto
 int md5(int *filesize, char *md5sum,FILE **fpp)
 {
     MD5_CTX ctx;
@@ -10,6 +12,7 @@ int md5(int *filesize, char *md5sum,FILE **fpp)
     int i,len;
     FILE *fp;
     fp = *fpp;
+    // 获取文件大小
     fseek(fp, 0, SEEK_END);
     if ((len=ftell(fp))==-1){
         printf("Sorry! Cannot calculate files which is larger then 2GB!\n");
@@ -17,6 +20,8 @@ int md5(int *filesize, char *md5sum,FILE **fpp)
         return 0;
     }
     *filesize = len;
+
+    // 回fp指针
     rewind(fp);
     MD5_Init(&ctx);
  

@@ -1,8 +1,9 @@
 #include "File_recv.h"
 
+//文件接收模块
 int FileReceive(int sockfd, struct sockaddr_in from, FILE **fp) {
     Packet recvWindow[MAX_PACKET_NUM+1];
-    int rvwd = 64; // Static
+    int rvwd = 64; // 暂定接收窗口大小为固定的64
     int recvfile = 0, FileNotEnd = 1, Nid = 0, RecvBuf = 0;
     struct timeval Ntime,Ptime;
     socklen_t slen = sizeof(from);

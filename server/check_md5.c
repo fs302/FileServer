@@ -1,6 +1,7 @@
 #include "check_md5.h"
 #include "../md5.h"
 
+// 服务器本地复制 source->target
 int copyfile(char *source, char *target)
 {
     FILE *fps,*fpt;
@@ -36,7 +37,7 @@ int copyfile(char *source, char *target)
 
 int check_md5(char *message)
 {
-    // Step1: get directory list
+    // Step1: 获取文件名列表 
     char dir_files[BUFFER_SIZE][BUFFER_SIZE]; // filenames in directory
     int record_exist[BUFFER_SIZE];            // flag of file record in db
     DIR *dir;
@@ -51,7 +52,7 @@ int check_md5(char *message)
         record_exist[file_num] = 0;
         file_num++;
     }
-    // Step2: get md5 database list & check record_exist
+    // Step2: 检查数据库 
     FILE *db;
     char buffer[BUFFER_SIZE];
     char filename[BUFFER_SIZE],md5sum[33]={'\0'};
@@ -93,7 +94,7 @@ int check_md5(char *message)
             fclose(fp);
         }
     }
-    // Step3: write database & Check message
+    // Step3: 更新数据库，比对message 
     db = fopen("md5_db.txt","w");
     int ret = 0;
     char message_file[BUFFER_SIZE],message_md5[33]={'\0'};

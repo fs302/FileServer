@@ -1,4 +1,4 @@
-/* middle.c */
+/* middle.c 中转程序 根据BandWidth.txt动态调整带宽*/
 
 #include <netinet/in.h>  // for sockaddr_in
 #include <sys/types.h>   // for socket

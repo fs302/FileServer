@@ -1,5 +1,6 @@
 #include "methods.h"
 
+// sendto 包裹函数
 int Sendto(int sockfd,const void *buff, size_t nbytes, int flags, const struct sockaddr *to, socklen_t addrlen)
 {
     int nSendBytes = sendto(sockfd, buff, nbytes, flags, to, addrlen);
@@ -11,6 +12,7 @@ int Sendto(int sockfd,const void *buff, size_t nbytes, int flags, const struct s
     return 0;
 }
 
+// recvfrom 包裹函数
 int Recvfrom(int sockfd,void *buff, size_t nbytes, int flags, struct sockaddr *from, socklen_t *addrlen)
 {
     int ret = recvfrom(sockfd, buff, nbytes, flags, from, addrlen);
@@ -22,6 +24,7 @@ int Recvfrom(int sockfd,void *buff, size_t nbytes, int flags, struct sockaddr *f
     return 0;
 }
 
+// select 包裹函数
 int readable_timeo(int fd, int sec, int usec)
 {
     fd_set rset;

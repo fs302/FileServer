@@ -1,14 +1,15 @@
 #include "server.h"
-#include "../methods.h"
-#include "../Transfer.h"
-#include "../File_recv.h"
-#include "check_md5.h"
-#include "show_dir.h"
+#include "../methods.h"  // 包含Sendto,Recvform等包裹函数。
+#include "../Transfer.h" // 发送模块
+#include "../File_recv.h"// 接收模块
+#include "check_md5.h"   // 验证md5模块
+#include "show_dir.h"    // 显示目录模块
 
 int server_socket;
 struct sockaddr_in server_addr, client_addr;
 socklen_t clen = sizeof(client_addr);
 
+// 创建套接字，绑定到熟知地址上
 int initConnection()
 {
     bzero(&server_addr, sizeof(server_addr));
@@ -28,6 +29,7 @@ int initConnection()
     return 0;
 }
 
+// 等待握手
 int WaitShakeHands(char *message, FILE **fp)
 {
     printf("Waiting request ...\n");
@@ -35,6 +37,7 @@ int WaitShakeHands(char *message, FILE **fp)
     Recvfrom(server_socket, (char *)&fnpack, sizeof(Packet), 0, (struct sockaddr *)&client_addr, &clen);
     bzero(message, FILE_NAME_MAX_SIZE+1);
     strncpy(message, fnpack.data, fnpack.dataLength>FILE_NAME_MAX_SIZE?FILE_NAME_MAX_SIZE:fnpack.dataLength);
+    // dataID==-1 表示下载请求
     if (fnpack.dataID == -1)
     {
         printf("Request File name: %s\n",message);
@@ -54,15 +57,16 @@ int WaitShakeHands(char *message, FILE **fp)
         strncpy(fnpack.data, NULL, 0);
         Sendto(server_socket, (char *)&fnpack, sizeof(Packet), 0, (struct sockaddr *)&client_addr, clen);
         return 1;
-    }
+    }// dataID == -2 表示显示目录请求
     else if( fnpack.dataID == -2)
     {
         Sendto(server_socket, (char *)&fnpack, sizeof(Packet), 0, (struct sockaddr *)&client_addr, clen);
         return 2;
-    }
+    }// dataID == -3 表示上传请求
     else if( fnpack.dataID == -3)
     {
-        if (check_md5(message)==1)
+        // 先验证md5,若存在同md5文件，则启动秒传
+        if (check_md5(message)==1) 
         {
             fnpack.dataID = -5;
             fnpack.dataLength = 0;
@@ -90,6 +94,7 @@ int main(int argc, char *argv[])
         FILE *fp = NULL;
         int req_num = 0;
         req_num = WaitShakeHands(message, &fp);
+        // req_num 对应请求的dataID：1表示下载，2表示显示目录，3表示上传。若req_num<0,则无须后续传输。
         if ( req_num==1 )
         {
             Packet req;

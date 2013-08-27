@@ -1,10 +1,10 @@
 #include "Transfer.h"
 
+// 文件发送模块
 int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
 {
     Packet sendWindow[MAX_WINDOW_SIZE];
     int cwnd = 1; // Initialize the sending window size
-    int ssthresh = 65535;
     int recvack = 0, FileNotEnd = 1, file_block_length = 0, Nid = 0;
     char buffer[BUFFER_SIZE];
     int reSendNum = 0;
@@ -19,9 +19,6 @@ int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
         {
             bzero(&buffer, BUFFER_SIZE);
             file_block_length = fread(buffer, sizeof(char), BUFFER_SIZE, *fp);
-            /**/
-            //printf("%s\n",buffer);
-            /**/
             if (file_block_length < 0){
                 printf("Read file buffer error.\n");
                 return -1;
@@ -50,7 +47,6 @@ int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
         while(recvack<cwnd)
         {
             printf("Sending %d packets.\n",cwnd);
-            //printf("Sstresh:%d\n",ssthresh); 
             for(i = 0;i < cwnd;i++)
             {
                 if (sendWindow[i].flag == 0){
@@ -79,7 +75,6 @@ int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
             if ( (timeo <= 0) && (recvack<cwnd) )
             {
                 printf("Losepack.\n");
-                //reTransmit(&sendWindow,cwnd);
                 losepack = 1;
             }
         } 

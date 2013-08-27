@@ -5,6 +5,7 @@ int client_socket;
 struct sockaddr_in server_addr, client_addr;
 socklen_t slen = sizeof(server_addr);
 
+// 创建套接字
 int initConnection()
 {
     bzero(&client_addr, sizeof(client_addr));
@@ -27,9 +28,11 @@ int initConnection()
     return 0;
 }
 
+// 发起三次握手
 int ShakeHands()
 {
     Packet fnpack;
+    // 显示目录的信号 dataID = -2
     fnpack.dataID = -2;
     strncpy(fnpack.data, NULL , 0);
     fnpack.dataLength = 0;
@@ -61,6 +64,7 @@ int main(int argc, char *argv[])
     Packet fn;
     if(ShakeHands()>0)
     {
+        // 开始接收文件目录，一个数据分组包含一个文件名
         printf("-----------------------------------------\n");
         for(;;){
             if (timeo = readable_timeo(client_socket,1,0) > 0)
