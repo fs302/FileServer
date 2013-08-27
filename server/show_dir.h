@@ -10,7 +10,6 @@
 #define MAX_WINDOW_SIZE 256 
 #define max(a,b) ((a) > (b) ? (a) : (b))
 #define min(a,b) ((a) < (b) ? (a) : (b))
-#define DEFAULT_DIR "/home/fs302/file_server/server"
 
 #ifndef PACKET_H
 #define PACKET_H

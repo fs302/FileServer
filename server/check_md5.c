@@ -43,7 +43,9 @@ int check_md5(char *message)
     DIR *dir;
     struct dirent *ptr;
     int i = 0,file_num = 0;
-    dir = opendir(DEFAULT_DIR);
+    char cur_dir[BUFFER_SIZE];
+    getcwd(cur_dir, BUFFER_SIZE);
+    dir = opendir(cur_dir);
     while( NULL != (ptr = readdir(dir)))
     {
         if (ptr->d_name[0]=='.')
@@ -105,9 +107,17 @@ int check_md5(char *message)
         sscanf(db_list[i],"%s\t%d\t%s",filename,&filesize,md5sum);
         if (strncmp(md5sum,message_md5,strlen(message_md5))==0)
         {
-            ret = 1;
-            if(strncmp(db_list[i],message,strlen(message)) != 0)
-                copyfile(filename,message_file);
+            // 再次确认实际文件的md5,因为有可能文件被窜改
+            FILE *fp;
+            char md5_recheck[33]={'\0'};
+            fp = fopen(filename,"rb");
+            md5(&filesize,md5_recheck,&fp);
+            if (strncmp(md5_recheck,message_md5,strlen(message_md5))==0)
+            {
+                ret = 1; // 秒传结论来之不易呀！
+                if(strncmp(db_list[i],message,strlen(message)) != 0)
+                    copyfile(filename,message_file);
+            }
         }
     }
     if (ret==0)

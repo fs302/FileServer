@@ -8,8 +8,10 @@ int Show_dir(int sockfd, struct sockaddr_in to)
     DIR *dir;
     struct dirent *ptr;
     int Nid = 0; 
-    printf("Show directory.\n");
-    dir = opendir(DEFAULT_DIR);
+    char cur_dir[BUFFER_SIZE];
+    printf("-----------Show directory-----------\n");
+    getcwd(cur_dir, BUFFER_SIZE); 
+    dir = opendir(cur_dir);
     
     while( (ptr = readdir(dir) ) != NULL)
     {
