@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
             if (newz <= BandtoC)
             {
                 double p = rand()*1.0/RAND_MAX;
-                if (p<0.0001){
+                if (p<0.000001){
                     printf("Dump packet:%lf\n",p);
                 }
                 else{

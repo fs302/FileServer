@@ -75,12 +75,17 @@ int Transfer(int sockfd, struct sockaddr_in to, FILE **fp)
             if ( (timeo <= 0) && (recvack<cwnd) )
             {
                 printf("Losepack.\n");
-                losepack = 1;
+                losepack += 1;
+                if (losepack>=5)
+                {
+                    printf("Network maybe broken. Stop transmit.\n");
+                    return -1;
+                }
             }
         } 
         if (losepack==0 && cwnd+1<=MAX_WINDOW_SIZE)
             cwnd += 1;
-        else if (losepack==1 && cwnd>1)
+        else if (losepack>=1 && cwnd>1)
             cwnd /= 2;
     }
     printf("ReSend %d times.\n",reSendNum);

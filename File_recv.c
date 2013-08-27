@@ -59,6 +59,11 @@ int FileReceive(int sockfd, struct sockaddr_in from, FILE **fp) {
                Sendto(sockfd, (char *)&ack, sizeof(Packet), 0,(struct sockaddr *)&from, slen);
            }
         }
+        if (recvfile < rvwd)
+        {
+            printf("Receive timeout. stop connection.\n");
+            break;
+        }
         // Write Packet data
         int id = Nid;
         for(id = Nid;id < Nid+rvwd;id++)
